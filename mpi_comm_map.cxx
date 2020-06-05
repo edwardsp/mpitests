@@ -26,14 +26,16 @@ int main(int argc, char* argv[]) {
 					if(rank == rank_src) {
 						double start_time = MPI_Wtime();
 						for(int i = 0; i < ITERATIONS; ++i) {
+							MPI_Status status;
 							MPI_Send(&data_a[0], DATASIZE, MPI_BYTE, rank_dst, 101, MPI_COMM_WORLD);
-							MPI_Recv(&data_b[0], DATASIZE, MPI_BYTE, rank_dst, 102, MPI_COMM_WORLD, 0);
+							MPI_Recv(&data_b[0], DATASIZE, MPI_BYTE, rank_dst, 102, MPI_COMM_WORLD, &status);
 						}
 						double end_time = MPI_Wtime();
 						map[rank_src*size + rank_dst] += end_time - start_time;
 					} else if (rank == rank_dst) {
 						for(int i = 0; i < ITERATIONS; ++i) {
-							MPI_Recv(&data_a[0], DATASIZE, MPI_BYTE, rank_src, 101, MPI_COMM_WORLD, 0);
+							MPI_Status status;
+							MPI_Recv(&data_a[0], DATASIZE, MPI_BYTE, rank_src, 101, MPI_COMM_WORLD, &status);
 							MPI_Send(&data_b[0], DATASIZE, MPI_BYTE, rank_src, 102, MPI_COMM_WORLD);
 						}
 					}
